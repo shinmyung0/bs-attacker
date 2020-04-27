@@ -83,6 +83,33 @@
         <button type="submit" class="btn btn-primary"> Execute</button>
     </form>
 
+
+    <h5> Results </h5>
+
+    <table class="table table-dark">
+        <thead>
+        <tr>
+            <th scope="col"> Result ID</th>
+            <th scope="col"> Execution ID</th>
+            <th scope="col"> TargetID </th>
+            <th scope="col"> Status </th>
+            <th scope="col"> Data </th>
+        </tr>
+        </thead>
+        <tbody>
+        <% results.forEach(r => { %>
+            <tr>
+                <td> <%- r.resultId %> </td>
+                <td> <%- r.executionId %> </td>
+                <td> <%- r.targetId %>  </td>
+                <td> <%- r.status %> </td>
+                <td> <%- r.data %> </td>
+            </tr>
+        <% }) %>
+        </tbody>
+    </table>
+
+
 </div>
 
 
@@ -160,7 +187,7 @@
     let urls = $("#urls").val();
     let scriptUrl = $("#scriptUrl").val();
 
-    
+
 
     let base64script = btoa(script);
 
@@ -171,7 +198,7 @@
       payload: {
         type,
         script: base64script,
-        urls, 
+        urls,
         scriptUrl
       }
     };
@@ -189,6 +216,7 @@
       body: JSON.stringify(body)
     }).then(res => {
       alert(JSON.stringify(body) + " has been sent");
+      location.reload()
     }).catch(err => {
       alert(err);
     });

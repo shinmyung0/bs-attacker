@@ -11,7 +11,7 @@ router.use((req, res, next) => {
 });
 
 router.get("/", (req, res) => {
-  res.render("index", {connections: Connections.connections});
+  res.render("index", {connections: Connections.connections, results: Result.getAll()});
 });
 
 /* execution */
