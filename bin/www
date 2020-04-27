@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 
-const {httpServer} = require("../app")
-const {serverPort} = require("../config")
+const { httpServer } = require("../app");
+const port = process.env.PORT || 9000;
 
-
-httpServer.listen(serverPort, () => {
-  console.log("attacker server is binding on port " + serverPort)
-})
-
-
+httpServer.listen(port, () => {
+  console.log("attacker server is binding on port " + port);
+});
