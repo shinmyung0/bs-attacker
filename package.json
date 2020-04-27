@@ -17,7 +17,9 @@
     "express-ejs-layouts": "^2.5.0",
     "fs-extra": "^9.0.0",
     "glob": "^7.1.6",
-    "superagent": "latest"
+    "nodemon": "^2.0.2",
+    "superagent": "latest",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.1.6",
@@ -27,7 +29,5 @@
     "babel-jest": "^23.6.0",
     "babel-loader": "^7.1.4",
     "jest": "^23.6.0",
-    "nodemon": "^2.0.2",
-    "socket.io": "^2.3.0"
   }
 }
