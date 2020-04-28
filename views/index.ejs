@@ -197,7 +197,13 @@
     let script = $("#script").val();
     let urls = $("#urls").val();
     let scriptUrl = $("#scriptUrl").val();
-    let tabQuery = JSON.parse($("#tabQuery").val() || {});
+    let tabQuery = $("#tabQuery").val()
+
+    if (!tabQuery) {
+      tabQuery = {}
+    } else {
+      tabQuery = JSON.parse(tabQuery)
+    }
 
 
 
