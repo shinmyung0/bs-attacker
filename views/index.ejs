@@ -60,10 +60,9 @@
             <select class="form-control" id="type" name="type">
                 <option value="content" selected> content</option>
                 <option value="content-inline"> content-inline</option>
-                <option value="content-inline-event"> content-inline-event</option>
+                <option value="content-query"> content-query</option>
                 <option value="content-external"> content-external</option>
                 <option value="background"> background</option>
-                <option value="background-external"> background-external</option>
             </select>
         </div>
         <div class="form-group" id="urls-groups">
@@ -76,10 +75,16 @@
           <input id="scriptUrl" type="text" class="form-control"
                  placeholder="url to load a script from e.g. https://www.evil.com/myscript.js">
       </div>
+      <div class="form-group" id="tab-query-groups" >
+        <label for="tabQuery"> custom query for tab (JSON) </label>
+        <input id="tabQuery" type="text" class="form-control"
+               placeholder="url to load a script from e.g. https://www.evil.com/myscript.js">
+      </div>
         <div class="form-group">
             <label for="script"> script payload </label>
             <textarea id="script" name="script" class="form-control"></textarea>
         </div>
+        
         <button type="submit" class="btn btn-primary"> Execute</button>
     </form>
 
@@ -153,6 +158,12 @@
           isValid = false
         }
         break;
+      case 'content-query':
+        if (!script) {
+          alert('script must be defined')
+          isValid = false
+        }
+        break;
       case 'content-external':
         if (!scriptUrl) {
           alert('scriptUrl must be defined')
@@ -186,6 +197,7 @@
     let script = $("#script").val();
     let urls = $("#urls").val();
     let scriptUrl = $("#scriptUrl").val();
+    let tabQuery = JSON.parse($("#tabQuery").val());
 
 
 
@@ -199,7 +211,8 @@
         type,
         script: base64script,
         urls,
-        scriptUrl
+        scriptUrl,
+        tabQuery
       }
     };
 
